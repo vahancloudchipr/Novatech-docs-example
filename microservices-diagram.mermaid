@@ -1,0 +1,113 @@
+graph TD
+    classDef apiGateway fill:#FF9E80,stroke:#232F3E,color:#232F3E
+    classDef bff fill:#FFD54F,stroke:#232F3E,color:#232F3E
+    classDef coreService fill:#81D4FA,stroke:#232F3E,color:#232F3E
+    classDef supportService fill:#A5D6A7,stroke:#232F3E,color:#232F3E
+    classDef dataStore fill:#CE93D8,stroke:#232F3E,color:#232F3E
+    classDef eventBus fill:#FFAB91,stroke:#232F3E,color:#232F3E
+    classDef client fill:#B39DDB,stroke:#232F3E,color:#232F3E
+    
+    %% Clients
+    Client1["Web Client"]
+    Client2["Mobile Client"]
+    Client3["Partner API Client"]
+    
+    %% API Gateway
+    Gateway["API Gateway"]
+    
+    %% BFFs (Backends for Frontends)
+    WebBFF["Web BFF"]
+    MobileBFF["Mobile BFF"]
+    PartnerBFF["Partner API BFF"]
+    
+    %% Core Microservices
+    UserService["User Service"]
+    CatalogService["Catalog Service"]
+    SearchService["Search Service"]
+    CartService["Cart Service"]
+    OrderService["Order Service"]
+    PaymentService["Payment Service"]
+    InventoryService["Inventory Service"]
+    FulfillmentService["Fulfillment Service"]
+    
+    %% Support Services
+    NotificationService["Notification Service"]
+    AnalyticsService["Analytics Service"]
+    
+    %% Data Stores
+    UserDB[("User Database<br>(Aurora PostgreSQL)")]
+    CatalogDB[("Catalog Database<br>(ElasticSearch)")]
+    CartDB[("Cart Cache<br>(ElastiCache)")]
+    OrderDB[("Order Database<br>(Aurora PostgreSQL)")]
+    PaymentDB[("Payment Database<br>(Aurora PostgreSQL)")]
+    InventoryDB[("Inventory Database<br>(DynamoDB)")]
+    FulfillmentDB[("Fulfillment Database<br>(Aurora PostgreSQL)")]
+    
+    %% Event Bus
+    EventBus["Event Bus<br>(SNS/SQS)"]
+    
+    %% Client Connections
+    Client1 --> Gateway
+    Client2 --> Gateway
+    Client3 --> Gateway
+    
+    %% Gateway to BFFs
+    Gateway --> WebBFF
+    Gateway --> MobileBFF
+    Gateway --> PartnerBFF
+    
+    %% BFFs to Core Services
+    WebBFF --> UserService
+    WebBFF --> CatalogService
+    WebBFF --> SearchService
+    WebBFF --> CartService
+    WebBFF --> OrderService
+    
+    MobileBFF --> UserService
+    MobileBFF --> CatalogService
+    MobileBFF --> SearchService
+    MobileBFF --> CartService
+    MobileBFF --> OrderService
+    
+    PartnerBFF --> CatalogService
+    PartnerBFF --> InventoryService
+    PartnerBFF --> OrderService
+    
+    %% Core Service Relationships
+    UserService --> UserDB
+    CatalogService --> CatalogDB
+    SearchService --> CatalogDB
+    CartService --> CartDB
+    CartService --> CatalogService
+    OrderService --> OrderDB
+    OrderService --> CartService
+    OrderService --> PaymentService
+    OrderService --> InventoryService
+    PaymentService --> PaymentDB
+    InventoryService --> InventoryDB
+    FulfillmentService --> FulfillmentDB
+    FulfillmentService --> OrderService
+    FulfillmentService --> InventoryService
+    
+    %% Event Publications
+    UserService --> EventBus
+    CatalogService --> EventBus
+    OrderService --> EventBus
+    PaymentService --> EventBus
+    InventoryService --> EventBus
+    FulfillmentService --> EventBus
+    
+    %% Event Subscriptions
+    EventBus --> NotificationService
+    EventBus --> AnalyticsService
+    EventBus --> InventoryService
+    EventBus --> SearchService
+    
+    %% Class Assignments
+    class Gateway apiGateway
+    class WebBFF,MobileBFF,PartnerBFF bff
+    class UserService,CatalogService,SearchService,CartService,OrderService,PaymentService,InventoryService,FulfillmentService coreService
+    class NotificationService,AnalyticsService supportService
+    class UserDB,CatalogDB,CartDB,OrderDB,PaymentDB,InventoryDB,FulfillmentDB dataStore
+    class EventBus eventBus
+    class Client1,Client2,Client3 client

@@ -1,0 +1,105 @@
+flowchart TD
+    classDef sourceSystem fill:#B39DDB,stroke:#4527A0,color:#4527A0,stroke-width:2px
+    classDef streamProcessing fill:#FFCC80,stroke:#EF6C00,color:#EF6C00,stroke-width:2px
+    classDef dataStore fill:#81D4FA,stroke:#0277BD,color:#0277BD,stroke-width:2px
+    classDef dataWarehouse fill:#A5D6A7,stroke:#2E7D32,color:#2E7D32,stroke-width:2px
+    classDef analytics fill:#F48FB1,stroke:#AD1457,color:#AD1457,stroke-width:2px
+    classDef consumptionLayer fill:#FFE082,stroke:#FF8F00,color:#FF8F00,stroke-width:2px
+
+    %% Source Systems
+    subgraph SourceSystems["Source Systems"]
+        TransactionalDBs["Transactional Databases<br>(Aurora PostgreSQL)"]
+        UserActivity["User Activity<br>(Web/Mobile)"]
+        ExternalAPIs["External APIs<br>(Partners/Vendors)"]
+        CRM["CRM System"]
+        ERP["ERP System"]
+    end
+
+    %% Real-Time Processing
+    subgraph StreamProcessing["Stream Processing"]
+        CDC["Change Data Capture<br>(DMS)"]
+        EventStreams["Event Streams<br>(Kinesis)"]
+        StreamProcessors["Stream Processors<br>(Kinesis Data Analytics)"]
+    end
+
+    %% Operational Data Stores
+    subgraph OperationalDataStores["Operational Data Stores"]
+        SearchIndex["Search Index<br>(OpenSearch)"]
+        OLTP["OLTP Databases<br>(Aurora/DynamoDB)"]
+        Cache["Cache Layer<br>(ElastiCache)"]
+    end
+
+    %% Data Lake
+    subgraph DataLake["Data Lake"]
+        RawZone["Raw Zone<br>(S3)"]
+        ProcessedZone["Processed Zone<br>(S3)"]
+        CuratedZone["Curated Zone<br>(S3)"]
+    end
+
+    %% Data Warehouse
+    subgraph DataWarehouse["Data Warehouse"]
+        DimensionalModel["Dimensional Model<br>(Redshift)"]
+        DataMarts["Data Marts<br>(Redshift)"]
+        OLAP["OLAP Cubes"]
+    end
+
+    %% Analytics & ML
+    subgraph AnalyticsML["Analytics & ML"]
+        AdHocAnalysis["Ad-hoc Analysis<br>(Athena)"]
+        BatchProcessing["Batch Processing<br>(EMR)"]
+        MachineLearning["Machine Learning<br>(SageMaker)"]
+    end
+
+    %% Data Consumption
+    subgraph DataConsumption["Data Consumption Layer"]
+        Dashboards["Dashboards<br>(QuickSight)"]
+        ReportingTools["Reporting Tools"]
+        MLApps["ML Applications"]
+        APIs["Analytics APIs"]
+    end
+
+    %% Flow connections
+    SourceSystems --> StreamProcessing
+    SourceSystems --> RawZone
+    
+    TransactionalDBs --> CDC
+    UserActivity --> EventStreams
+    ExternalAPIs --> EventStreams
+    CRM --> RawZone
+    ERP --> RawZone
+    
+    CDC --> EventStreams
+    EventStreams --> StreamProcessors
+    StreamProcessors --> OperationalDataStores
+    StreamProcessors --> RawZone
+    
+    RawZone --> ProcessedZone
+    ProcessedZone --> CuratedZone
+    CuratedZone --> DimensionalModel
+    
+    DimensionalModel --> DataMarts
+    DataMarts --> OLAP
+    
+    RawZone --> AdHocAnalysis
+    ProcessedZone --> AdHocAnalysis
+    CuratedZone --> AdHocAnalysis
+    
+    RawZone --> BatchProcessing
+    ProcessedZone --> BatchProcessing
+    BatchProcessing --> MachineLearning
+    
+    ProcessedZone --> MachineLearning
+    
+    DataWarehouse --> Dashboards
+    DataWarehouse --> ReportingTools
+    MachineLearning --> MLApps
+    CuratedZone --> APIs
+    DataMarts --> APIs
+    
+    %% Apply styles
+    class SourceSystems sourceSystem
+    class StreamProcessing streamProcessing
+    class OperationalDataStores dataStore
+    class DataLake,DataWarehouse dataWarehouse
+    class AnalyticsML analytics
+    class DataConsumption consumptionLayer

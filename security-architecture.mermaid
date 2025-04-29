@@ -1,0 +1,141 @@
+flowchart TD
+    classDef networkDefense fill:#FFCCBC,stroke:#D84315,color:#D84315,stroke-width:2px
+    classDef identityMgmt fill:#BBDEFB,stroke:#1565C0,color:#1565C0,stroke-width:2px
+    classDef dataProtection fill:#C8E6C9,stroke:#2E7D32,color:#2E7D32,stroke-width:2px
+    classDef endpointSec fill:#E1BEE7,stroke:#7B1FA2,color:#7B1FA2,stroke-width:2px
+    classDef appSecurity fill:#FFE0B2,stroke:#EF6C00,color:#EF6C00,stroke-width:2px
+    classDef monitoring fill:#B2EBF2,stroke:#0097A7,color:#0097A7,stroke-width:2px
+    classDef governance fill:#F8BBD0,stroke:#C2185B,color:#C2185B,stroke-width:2px
+
+    %% Network Security
+    subgraph NetworkDefense["Network Defense Layer"]
+        DDOSProtection["DDoS Protection<br>(AWS Shield)"]
+        WAF["Web Application Firewall<br>(AWS WAF)"]
+        CloudFront["Content Delivery<br>(CloudFront)"]
+        SecurityGroups["Security Groups"]
+        NACLs["Network ACLs"]
+        PrivateSubnets["Private Subnets"]
+        Firewall["Network Firewall"]
+    end
+
+    %% Identity & Access Management
+    subgraph IdentityMgmt["Identity & Access Management"]
+        IAM["AWS IAM"]
+        AWSSSO["AWS Single Sign-On"]
+        ResourcePolicies["Resource Policies"]
+        ServiceControl["Service Control Policies"]
+        IdentityFederation["Identity Federation<br>(OAuth/OIDC)"]
+        MFA["Multi-Factor Authentication"]
+        PrivilegedAccess["Privileged Access Management"]
+    end
+
+    %% Data Protection
+    subgraph DataProtection["Data Protection Layer"]
+        EncryptionRest["Encryption at Rest<br>(KMS/S3/EBS)"]
+        EncryptionTransit["Encryption in Transit<br>(TLS 1.3)"]
+        Secrets["Secret Management<br>(Secrets Manager)"]
+        Parameters["Parameter Store"]
+        KeyMgmt["Key Management<br>(AWS KMS)"]
+        DataLossPrevention["Data Loss Prevention"]
+    end
+
+    %% Endpoint Security
+    subgraph EndpointSec["Endpoint Security"]
+        EndpointProtection["Endpoint Protection"]
+        VulnManagement["Vulnerability Management"]
+        PatchMgmt["Patch Management"]
+        Hardening["System Hardening"]
+    end
+
+    %% Application Security
+    subgraph AppSecurity["Application Security"]
+        SAST["Static Application<br>Security Testing"]
+        DAST["Dynamic Application<br>Security Testing"]
+        SCA["Software Composition<br>Analysis"]
+        SecureDevOps["Secure DevOps"]
+        APIGateway["API Gateway<br>Security Controls"]
+        InputValidation["Input Validation"]
+        OWASP["OWASP Top 10<br>Mitigations"]
+    end
+
+    %% Monitoring & Detection
+    subgraph Monitoring["Monitoring & Detection"]
+        CloudTrail["AWS CloudTrail"]
+        GuardDuty["Amazon GuardDuty"]
+        SecurityHub["AWS Security Hub"]
+        ConfigRules["AWS Config Rules"]
+        SIEM["Security Information and<br>Event Management"]
+        ThreatIntelligence["Threat Intelligence"]
+        BehaviorAnalytics["User Behavior Analytics"]
+    end
+
+    %% Governance & Compliance
+    subgraph Governance["Governance & Compliance"]
+        PolicyMgmt["Policy Management"]
+        ComplianceFrameworks["Compliance Frameworks<br>(PCI DSS, GDPR, etc.)"]
+        RiskAssessment["Risk Assessment"]
+        AuditMgmt["Audit Management"]
+        Training["Security Training<br>& Awareness"]
+    end
+
+    %% Connections
+    InternetUsers(("Internet<br>Users")) --> DDOSProtection
+    DDOSProtection --> WAF
+    WAF --> CloudFront
+    CloudFront --> SecurityGroups
+    SecurityGroups --> NACLs
+    NACLs --> PrivateSubnets
+    PrivateSubnets --> Firewall
+
+    Firewall --> IAM
+    IAM --> AWSSSO
+    IAM --> ResourcePolicies
+    IAM --> ServiceControl
+    IdentityFederation --> IAM
+    MFA --> IAM
+    PrivilegedAccess --> IAM
+
+    IAM --> EncryptionRest
+    IAM --> EncryptionTransit
+    IAM --> Secrets
+    IAM --> Parameters
+    IAM --> KeyMgmt
+    KeyMgmt --> EncryptionRest
+    KeyMgmt --> EncryptionTransit
+    KeyMgmt --> Secrets
+    DataLossPrevention --> EncryptionRest
+
+    IAM --> EndpointProtection
+    VulnManagement --> EndpointProtection
+    PatchMgmt --> EndpointProtection
+    Hardening --> EndpointProtection
+
+    IAM --> SAST
+    IAM --> DAST
+    IAM --> SCA
+    IAM --> SecureDevOps
+    IAM --> APIGateway
+    APIGateway --> InputValidation
+    InputValidation --> OWASP
+
+    CloudTrail --> SIEM
+    GuardDuty --> SIEM
+    SecurityHub --> SIEM
+    ConfigRules --> SIEM
+    ThreatIntelligence --> SIEM
+    BehaviorAnalytics --> SIEM
+
+    SIEM --> PolicyMgmt
+    SIEM --> ComplianceFrameworks
+    SIEM --> RiskAssessment
+    SIEM --> AuditMgmt
+    Training --> PolicyMgmt
+
+    %% Apply styles
+    class NetworkDefense networkDefense
+    class IdentityMgmt identityMgmt
+    class DataProtection dataProtection
+    class EndpointSec endpointSec
+    class AppSecurity appSecurity
+    class Monitoring monitoring
+    class Governance governance

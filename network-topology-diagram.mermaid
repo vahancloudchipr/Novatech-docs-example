@@ -1,0 +1,137 @@
+flowchart TD
+    classDef internet fill:#ECEFF1,stroke:#455A64,color:#455A64,stroke-width:2px
+    classDef edgeServices fill:#BBDEFB,stroke:#1565C0,color:#1565C0,stroke-width:2px
+    classDef networkPerimeter fill:#FFCCBC,stroke:#D84315,color:#D84315,stroke-width:2px
+    classDef transitNetwork fill:#C8E6C9,stroke:#2E7D32,color:#2E7D32,stroke-width:2px
+    classDef vpc fill:#E1BEE7,stroke:#7B1FA2,color:#7B1FA2,stroke-width:2px
+    classDef subnet fill:#FFE0B2,stroke:#EF6C00,color:#EF6C00,stroke-width:2px
+    classDef onPremise fill:#B2EBF2,stroke:#0097A7,color:#0097A7,stroke-width:2px
+    
+    %% Internet & Edge
+    Internet((Internet))
+    
+    subgraph EdgeServices["Edge Services"]
+        CloudFront["CloudFront<br>CDN"]
+        Route53["Route 53<br>DNS"]
+        WAF["AWS WAF"]
+        Shield["AWS Shield<br>DDoS Protection"]
+    end
+    
+    %% Network Perimeter
+    subgraph NetworkPerimeter["Network Perimeter"]
+        IGW["Internet<br>Gateway"]
+        TGW["Transit<br>Gateway"]
+        NATGW["NAT<br>Gateway"]
+    end
+    
+    %% Transit Network
+    subgraph TransitNetwork["Transit Network"]
+        TransitVPC["Transit VPC<br>10.0.0.0/16"]
+        NetworkFirewall["Network<br>Firewall"]
+        VPCEndpoints["VPC<br>Endpoints"]
+    end
+    
+    %% Production VPC
+    subgraph ProdVPC["Production VPC (10.1.0.0/16)"]
+        subgraph ProdPublicSubnets["Public Subnets"]
+            ProdPublicSubnet1["Public Subnet<br>10.1.0.0/24<br>AZ1"]
+            ProdPublicSubnet2["Public Subnet<br>10.1.1.0/24<br>AZ2"]
+            ALB["Application<br>Load Balancer"]
+        end
+        
+        subgraph ProdPrivateSubnets["Private App Subnets"]
+            ProdAppSubnet1["App Subnet<br>10.1.2.0/24<br>AZ1"]
+            ProdAppSubnet2["App Subnet<br>10.1.3.0/24<br>AZ2"]
+            EKS["EKS<br>Cluster"]
+            EC2["EC2<br>Instances"]
+        end
+        
+        subgraph ProdDataSubnets["Private Data Subnets"]
+            ProdDataSubnet1["Data Subnet<br>10.1.4.0/24<br>AZ1"]
+            ProdDataSubnet2["Data Subnet<br>10.1.5.0/24<br>AZ2"]
+            RDS["RDS<br>Database"]
+            Elasticache["Elasticache<br>Redis"]
+        end
+    end
+    
+    %% Staging VPC
+    subgraph StagingVPC["Staging VPC (10.2.0.0/16)"]
+        StagingSubnets["App & Data<br>Subnets"]
+    end
+    
+    %% Dev VPC
+    subgraph DevVPC["Development VPC (10.3.0.0/16)"]
+        DevSubnets["App & Data<br>Subnets"]
+    end
+    
+    %% Shared Services VPC
+    subgraph SharedVPC["Shared Services VPC (10.4.0.0/16)"]
+        CICD["CI/CD<br>Tools"]
+        Monitoring["Monitoring<br>Stack"]
+        Logging["Centralized<br>Logging"]
+    end
+    
+    %% On-Premises
+    subgraph OnPremise["On-Premises Data Center"]
+        DirectConnect["AWS Direct<br>Connect"]
+        CorporateNetwork["Corporate<br>Network"]
+        DataCenter["Data<br>Center"]
+    end
+    
+    %% Draw connections - Internet to Edge
+    Internet <--> CloudFront
+    Internet <--> Route53
+    CloudFront <--> WAF
+    WAF <--> Shield
+    
+    %% Edge to Network Perimeter
+    EdgeServices <--> IGW
+    
+    %% Network Perimeter
+    IGW <--> TGW
+    TGW <--> NATGW
+    
+    %% Transit Network
+    TGW <--> TransitVPC
+    TransitVPC <--> NetworkFirewall
+    TransitVPC <--> VPCEndpoints
+    
+    %% Transit to VPCs
+    TGW <--> ProdVPC
+    TGW <--> StagingVPC
+    TGW <--> DevVPC
+    TGW <--> SharedVPC
+    
+    %% Production VPC Internal
+    ProdPublicSubnets <--> ProdPrivateSubnets
+    ProdPrivateSubnets <--> ProdDataSubnets
+    
+    %% Load Balancer and Subnets
+    IGW <--> ALB
+    ALB <--> EKS
+    ALB <--> EC2
+    
+    %% App to Data
+    EKS <--> RDS
+    EKS <--> Elasticache
+    EC2 <--> RDS
+    EC2 <--> Elasticache
+    
+    %% Direct Connect
+    DirectConnect <--> TGW
+    DirectConnect <--> CorporateNetwork
+    CorporateNetwork <--> DataCenter
+    
+    %% Shared Services to other VPCs
+    SharedVPC <-.-> ProdVPC
+    SharedVPC <-.-> StagingVPC
+    SharedVPC <-.-> DevVPC
+    
+    %% Apply styles
+    class Internet internet
+    class EdgeServices edgeServices
+    class NetworkPerimeter networkPerimeter
+    class TransitNetwork transitNetwork
+    class ProdVPC,StagingVPC,DevVPC,SharedVPC vpc
+    class ProdPublicSubnets,ProdPrivateSubnets,ProdDataSubnets,StagingSubnets,DevSubnets subnet
+    class OnPremise onPremise

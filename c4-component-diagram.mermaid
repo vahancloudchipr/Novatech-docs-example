@@ -1,0 +1,186 @@
+C4Component
+    title NovaTech E-commerce Platform - Component Diagram
+
+    Container_Boundary(api_gateway, "API Gateway") {
+        Component(api_routes, "API Routes", "Amazon API Gateway", "Routes client requests to appropriate backends")
+        Component(auth, "Authentication", "JWT/OAuth", "Validates user tokens and handles authorization")
+        Component(throttling, "Rate Limiting", "API Gateway", "Prevents service abuse")
+    }
+
+    Container_Boundary(web_bff, "Web BFF") {
+        Component(web_api, "Web API", "Node.js/Express", "Web-optimized API layer")
+        Component(web_aggregator, "Aggregator", "Node.js", "Combines data from multiple services")
+        Component(web_cache, "Response Cache", "Redis", "Caches common API responses")
+    }
+
+    Container_Boundary(mobile_bff, "Mobile BFF") {
+        Component(mobile_api, "Mobile API", "Node.js/Express", "Mobile-optimized API layer")
+        Component(mobile_data, "Data Transformer", "Node.js", "Optimizes payloads for mobile clients")
+        Component(mobile_cache, "Response Cache", "Redis", "Caches common API responses")
+    }
+
+    Container_Boundary(user_service, "User Service") {
+        Component(user_api, "User API", "Node.js/Express", "User management endpoints")
+        Component(user_auth, "Auth Logic", "Node.js", "User authentication and authorization logic")
+        Component(user_profile, "Profile Manager", "Node.js", "User profile management")
+        Component(user_db, "User Database", "Amazon Aurora PostgreSQL", "Stores user data and profiles")
+    }
+
+    Container_Boundary(catalog_service, "Catalog Service") {
+        Component(catalog_api, "Catalog API", "Node.js/Express", "Product catalog endpoints")
+        Component(product_manager, "Product Manager", "Node.js", "Product CRUD operations")
+        Component(catalog_search, "Search Interface", "Node.js", "Interfaces with search service")
+        Component(catalog_db, "Catalog Database", "Amazon Aurora PostgreSQL", "Stores product data")
+    }
+
+    Container_Boundary(search_service, "Search Service") {
+        Component(search_api, "Search API", "Node.js/Express", "Search endpoints")
+        Component(search_indexer, "Indexer", "Node.js", "Indexes catalog data")
+        Component(search_engine, "Search Engine", "OpenSearch", "Provides full-text search capabilities")
+    }
+
+    Container_Boundary(cart_service, "Cart Service") {
+        Component(cart_api, "Cart API", "Node.js/Express", "Shopping cart endpoints")
+        Component(cart_manager, "Cart Manager", "Node.js", "Cart manipulation logic")
+        Component(cart_db, "Cart Database", "ElastiCache Redis", "Stores cart data")
+    }
+
+    Container_Boundary(order_service, "Order Service") {
+        Component(order_api, "Order API", "Node.js/Express", "Order management endpoints")
+        Component(order_processor, "Order Processor", "Node.js", "Order business logic")
+        Component(checkout, "Checkout Manager", "Node.js", "Handles checkout process")
+        Component(order_db, "Order Database", "Amazon Aurora PostgreSQL", "Stores order data")
+    }
+
+    Container_Boundary(payment_service, "Payment Service") {
+        Component(payment_api, "Payment API", "Node.js/Express", "Payment processing endpoints")
+        Component(payment_processor, "Payment Processor", "Node.js", "Payment business logic")
+        Component(payment_gateway, "Payment Gateway", "Node.js", "Interfaces with external payment providers")
+        Component(payment_db, "Payment Database", "Amazon Aurora PostgreSQL", "Stores payment transactions")
+    }
+
+    Container_Boundary(inventory_service, "Inventory Service") {
+        Component(inventory_api, "Inventory API", "Node.js/Express", "Inventory management endpoints")
+        Component(stock_manager, "Stock Manager", "Node.js", "Inventory business logic")
+        Component(reservation, "Reservation System", "Node.js", "Handles product reservations")
+        Component(inventory_db, "Inventory Database", "Amazon DynamoDB", "Stores inventory data")
+    }
+
+    Container_Boundary(fulfillment_service, "Fulfillment Service") {
+        Component(fulfillment_api, "Fulfillment API", "Node.js/Express", "Fulfillment endpoints")
+        Component(shipping_manager, "Shipping Manager", "Node.js", "Manages shipping processes")
+        Component(tracking, "Tracking System", "Node.js", "Handles shipment tracking")
+        Component(fulfillment_db, "Fulfillment Database", "Amazon Aurora PostgreSQL", "Stores fulfillment data")
+    }
+
+    Container_Boundary(notification_service, "Notification Service") {
+        Component(notification_api, "Notification API", "Node.js/Express", "Notification endpoints")
+        Component(email_sender, "Email Sender", "Node.js", "Handles email notifications")
+        Component(sms_sender, "SMS Sender", "Node.js", "Handles SMS notifications")
+        Component(push_sender, "Push Sender", "Node.js", "Handles push notifications")
+        Component(notification_db, "Notification Database", "Amazon DynamoDB", "Stores notification data")
+    }
+
+    Container_Boundary(analytics_service, "Analytics Service") {
+        Component(analytics_api, "Analytics API", "Node.js/Express", "Analytics endpoints")
+        Component(data_collector, "Data Collector", "Node.js", "Collects analytics data")
+        Component(reporting, "Reporting Engine", "Node.js", "Generates reports")
+        Component(analytics_storage, "Analytics Storage", "Amazon S3 + Athena", "Stores analytics data")
+    }
+
+    Container_Boundary(events_platform, "Events Platform") {
+        Component(event_bus, "Event Bus", "Amazon SNS/SQS", "Distributes events across services")
+        Component(event_processor, "Event Processor", "AWS Lambda", "Processes and routes events")
+        Component(event_store, "Event Store", "Amazon Kinesis", "Stores event streams")
+    }
+
+    Rel(api_routes, web_api, "Routes web requests")
+    Rel(api_routes, mobile_api, "Routes mobile requests")
+    Rel(api_routes, auth, "Validates tokens")
+
+    Rel(web_api, web_aggregator, "Uses")
+    Rel(web_aggregator, web_cache, "Caches responses")
+    Rel(mobile_api, mobile_data, "Uses")
+    Rel(mobile_data, mobile_cache, "Caches responses")
+
+    Rel(web_aggregator, user_api, "Gets user data")
+    Rel(web_aggregator, catalog_api, "Gets catalog data")
+    Rel(web_aggregator, search_api, "Performs searches")
+    Rel(web_aggregator, cart_api, "Manages cart")
+    Rel(web_aggregator, order_api, "Manages orders")
+
+    Rel(mobile_data, user_api, "Gets user data")
+    Rel(mobile_data, catalog_api, "Gets catalog data")
+    Rel(mobile_data, search_api, "Performs searches")
+    Rel(mobile_data, cart_api, "Manages cart")
+    Rel(mobile_data, order_api, "Manages orders")
+
+    Rel(user_api, user_auth, "Uses")
+    Rel(user_api, user_profile, "Uses")
+    Rel(user_auth, user_db, "Reads/writes")
+    Rel(user_profile, user_db, "Reads/writes")
+
+    Rel(catalog_api, product_manager, "Uses")
+    Rel(catalog_api, catalog_search, "Uses")
+    Rel(product_manager, catalog_db, "Reads/writes")
+    Rel(catalog_search, search_api, "Queries")
+
+    Rel(search_api, search_engine, "Queries")
+    Rel(search_indexer, catalog_db, "Reads")
+    Rel(search_indexer, search_engine, "Indexes")
+
+    Rel(cart_api, cart_manager, "Uses")
+    Rel(cart_manager, cart_db, "Reads/writes")
+    Rel(cart_manager, catalog_api, "Gets product info")
+
+    Rel(order_api, order_processor, "Uses")
+    Rel(order_api, checkout, "Uses")
+    Rel(order_processor, order_db, "Reads/writes")
+    Rel(checkout, cart_api, "Gets cart")
+    Rel(checkout, payment_api, "Processes payment")
+    Rel(checkout, inventory_api, "Reserves inventory")
+
+    Rel(payment_api, payment_processor, "Uses")
+    Rel(payment_processor, payment_gateway, "Uses")
+    Rel(payment_processor, payment_db, "Reads/writes")
+
+    Rel(inventory_api, stock_manager, "Uses")
+    Rel(inventory_api, reservation, "Uses")
+    Rel(stock_manager, inventory_db, "Reads/writes")
+    Rel(reservation, inventory_db, "Reads/writes")
+
+    Rel(fulfillment_api, shipping_manager, "Uses")
+    Rel(fulfillment_api, tracking, "Uses")
+    Rel(shipping_manager, fulfillment_db, "Reads/writes")
+    Rel(tracking, fulfillment_db, "Reads/writes")
+    Rel(shipping_manager, inventory_api, "Updates inventory")
+    Rel(shipping_manager, order_api, "Updates order status")
+
+    Rel(notification_api, email_sender, "Uses")
+    Rel(notification_api, sms_sender, "Uses")
+    Rel(notification_api, push_sender, "Uses")
+    Rel(email_sender, notification_db, "Reads/writes")
+    Rel(sms_sender, notification_db, "Reads/writes")
+    Rel(push_sender, notification_db, "Reads/writes")
+
+    Rel(analytics_api, data_collector, "Uses")
+    Rel(analytics_api, reporting, "Uses")
+    Rel(data_collector, analytics_storage, "Writes")
+    Rel(reporting, analytics_storage, "Reads")
+
+    Rel(event_bus, event_processor, "Triggers")
+    Rel(event_processor, event_store, "Records")
+
+    Rel(user_api, event_bus, "Publishes events")
+    Rel(catalog_api, event_bus, "Publishes events")
+    Rel(order_api, event_bus, "Publishes events")
+    Rel(payment_api, event_bus, "Publishes events")
+    Rel(inventory_api, event_bus, "Publishes events")
+    Rel(fulfillment_api, event_bus, "Publishes events")
+
+    Rel(event_bus, notification_api, "Triggers notifications")
+    Rel(event_bus, analytics_api, "Sends data")
+    Rel(event_bus, search_indexer, "Triggers indexing")
+    Rel(event_bus, inventory_api, "Updates inventory")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

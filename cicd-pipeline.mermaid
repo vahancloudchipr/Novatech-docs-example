@@ -1,0 +1,133 @@
+flowchart LR
+    classDef sourceCls fill:#BBDEFB,stroke:#1565C0,color:#1565C0,stroke-width:2px
+    classDef buildCls fill:#C8E6C9,stroke:#2E7D32,color:#2E7D32,stroke-width:2px
+    classDef testCls fill:#FFF9C4,stroke:#F9A825,color:#F9A825,stroke-width:2px
+    classDef staticCls fill:#E1BEE7,stroke:#7B1FA2,color:#7B1FA2,stroke-width:2px
+    classDef securityCls fill:#FFCCBC,stroke:#D84315,color:#D84315,stroke-width:2px
+    classDef approveCls fill:#B2EBF2,stroke:#0097A7,color:#0097A7,stroke-width:2px
+    classDef deployCls fill:#FFE0B2,stroke:#EF6C00,color:#EF6C00,stroke-width:2px
+    classDef validateCls fill:#F8BBD0,stroke:#C2185B,color:#C2185B,stroke-width:2px
+    
+    %% Source Stage
+    subgraph Source["Source Stage"]
+        A1[Developer Commit]
+        A2[Pull Request]
+        A3[Code Review]
+        A4[Merge to Main]
+        A5[Trigger Pipeline]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+    end
+    
+    %% Build Stage
+    subgraph Build["Build Stage"]
+        B1[Checkout Code]
+        B2[Install Dependencies]
+        B3[Compile/Build]
+        B4[Create Artifacts]
+        B5[Push Artifacts]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+    end
+    
+    %% Test Stage
+    subgraph Test["Test Stage"]
+        C1[Unit Tests]
+        C2[Integration Tests]
+        C3[API Contract Tests]
+        C4[Test Coverage Analysis]
+        
+        C1 --> C2
+        C2 --> C3
+        C3 --> C4
+    end
+    
+    %% Static Analysis Stage
+    subgraph StaticAnalysis["Static Analysis Stage"]
+        D1[Code Quality]
+        D2[Code Style Check]
+        D3[Architecture Compliance]
+        D4[Dependency Analysis]
+        
+        D1 --> D2
+        D2 --> D3
+        D3 --> D4
+    end
+    
+    %% Security Scan Stage
+    subgraph SecurityScan["Security Scan Stage"]
+        E1[SAST]
+        E2[Dependency Scan]
+        E3[License Compliance]
+        E4[Container Scan]
+        
+        E1 --> E2
+        E2 --> E3
+        E3 --> E4
+    end
+    
+    %% Approval Stage
+    subgraph Approval["Approval Stage"]
+        F1[QA Approval]
+        F2[Product Owner Approval]
+        F3{Production Deploy?}
+        F4[Management Approval]
+        
+        F1 --> F2
+        F2 --> F3
+        F3 -->|Yes| F4
+        F3 -->|No| G1
+    end
+    
+    %% Deployment Stage
+    subgraph Deploy["Deployment Stage"]
+        G1[Deploy to Staging]
+        G2[Smoke Tests]
+        G3[Deploy to Production]
+        G4[Canary Deployment]
+        G5[Progressive Rollout]
+        
+        G1 --> G2
+        G2 --> G3
+        G3 --> G4
+        G4 --> G5
+    end
+    
+    %% Post-Deployment Validation
+    subgraph PostDeploy["Post-Deployment Validation"]
+        H1[Health Checks]
+        H2[Synthetic Monitoring]
+        H3[Log Analysis]
+        H4[Performance Metrics]
+        H5[User Monitoring]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+    end
+    
+    %% Pipeline Flow
+    Source --> Build
+    Build --> Test
+    Test --> StaticAnalysis
+    StaticAnalysis --> SecurityScan
+    SecurityScan --> Approval
+    Approval --> Deploy
+    Deploy --> PostDeploy
+    
+    %% Style Classes
+    class Source sourceCls
+    class Build buildCls
+    class Test testCls
+    class StaticAnalysis staticCls
+    class SecurityScan securityCls
+    class Approval approveCls
+    class Deploy deployCls
+    class PostDeploy validateCls
